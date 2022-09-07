@@ -14,4 +14,4 @@ Board Manager:
 esp8266 by ESP8266 Community Version 3.0.2
 
 Library:  
-NTPClient by Fabrice Weinberg Version 3.2.1 (under official esp8266 board manager)
+EspSoftwareSerial by Fabrice Weinberg Version 3.2.1 (under official esp8266 board manager) https://github.com/plerup/espsoftwareserial
