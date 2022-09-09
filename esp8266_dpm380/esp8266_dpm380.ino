@@ -1,4 +1,4 @@
-#include <SoftwareSerial.h>   // esp8266 board library 3.0.2
+#include <SoftwareSerial.h>
 
 // modbus connection: (+) -> A, (-) -> B
 #define RX  12    // D6 -> RXD RS485 module
@@ -7,10 +7,8 @@
 SoftwareSerial modbus;
 
 unsigned char address[200];
-int i, temp;
-unsigned int crc;
-unsigned long int data;
-unsigned long int pkWh, kVAh;
+int temp;
+unsigned long int data, pkWh, kVAh, p1, p2, p3, s1, s2, s3, q1, q2, q3;
 signed long int W, VA, VAR;
 float pf, Hz, I1, I2, I3, In, v12, v23, v31, v1, v2, v3;
 float thdI1, thdI2, thdI3, thdV1, thdV2, thdV3;
@@ -29,8 +27,8 @@ void loop() {
   delay(100);
   modbus_receive();
 
-  if (temp == 1) Serial.println("\n----Success----\n");
-  else Serial.println("\n----Not Success----\n");
+  if (temp == 1) Serial.println("\n----Receive Success----\n");
+  else Serial.println("\n----Receive Not Success----\n");
 
   delay(1000);
 }
@@ -42,19 +40,18 @@ void modbus_request(unsigned char slave, unsigned char addr1, unsigned char addr
   address[3] = addr1; // start register address Low
   address[4] = 0x00;
   address[5] = addr2; // size register to read in hex
-  crc = CRC16(6);
+  unsigned int crc = CRC16(6);
   address[6] = crc & 0xFF;
   address[7] = (crc >> 8) & 0xFF;
 
-  for (i = 0; i < 8; i++) modbus.write(address[i]);
+  for (int i = 0; i < 8; i++) modbus.write(address[i]);
 
-  i = 0;
+  int i = 0;
   while ((modbus.available() == 0) & (i < 100)) i++;
 }
 
 int CRC16(int DataLength) {
-  unsigned int CheckSum;
-  CheckSum = 0xFFFF;
+  unsigned int CheckSum = 0xFFFF;
   for (int m = 0; m < DataLength; m++) {
     CheckSum = CheckSum ^ address[m];
     for (int n = 0; n < 8; n++) {
@@ -70,13 +67,13 @@ void modbus_receive() {
   if (modbus.available()) {
     
     delay(100);
-    i = 0;
+    int i = 0;
     while (modbus.available()) address[i++] = modbus.read();
 
     Serial.println(i);
 
-    for (int m = 0; m < i; m++) {
-      Serial.print(address[m], HEX);
+    for (int j = 0; j < i; j++) {
+      Serial.print(address[j], HEX);
       Serial.print(" ");
     }
     Serial.println();
@@ -232,6 +229,87 @@ void modbus_receive() {
       data = (data << 8) | address[82];
       v3 = data * 0.1;
       Serial.print("\t v3 = "); Serial.print(v3, 1); Serial.println(" V");
+
+      //Real power phase L1
+      data = 0; 
+      data = (data << 8) | address[83]; 
+      data = (data << 8) | address[84]; 
+      data = (data << 8) | address[85]; 
+      data = (data << 8) | address[86]; 
+      p1 = data;
+      Serial.print("\t p1 = "); Serial.print(p1); Serial.println(" W");
+
+      //Real power phase L2
+      data = 0; 
+      data = (data << 8) | address[87]; 
+      data = (data << 8) | address[88]; 
+      data = (data << 8) | address[89]; 
+      data = (data << 8) | address[90]; 
+      p2 = data;
+      Serial.print("\t p2 = "); Serial.print(p2); Serial.println(" W");
+
+      //Real power phase L3
+      data = 0;
+      data = (data << 8) | address[91]; 
+      data = (data << 8) | address[92]; 
+      data = (data << 8) | address[93]; 
+      data = (data << 8) | address[94]; 
+      p3 = data;
+      Serial.print("\t p3 = "); Serial.print(p3); Serial.println(" W");
+
+      //Apparent power phase L1
+      data = 0;
+      data = (data << 8) | address[95]; 
+      data = (data << 8) | address[96]; 
+      data = (data << 8) | address[97]; 
+      data = (data << 8) | address[98]; 
+      s1 = data;
+      Serial.print("\t s1 = "); Serial.print(s1); Serial.println(" VA");
+
+      //Apparent power phase L2
+      data = 0;
+      data = (data << 8) | address[99]; 
+      data = (data << 8) | address[100]; 
+      data = (data << 8) | address[101]; 
+      data = (data << 8) | address[102]; 
+      s2 = data;
+      Serial.print("\t s2 = "); Serial.print(s2); Serial.println(" VA");
+
+      //Apparent power phase L3
+      data = 0;
+      data = (data << 8) | address[103]; 
+      data = (data << 8) | address[104]; 
+      data = (data << 8) | address[105]; 
+      data = (data << 8) | address[106]; 
+      s3 = data;
+      Serial.print("\t s3 = "); Serial.print(s3); Serial.println(" VA");
+
+      //Reactive power phase L1
+      data = 0;
+      data = (data << 8) | address[107]; 
+      data = (data << 8) | address[108]; 
+      data = (data << 8) | address[109]; 
+      data = (data << 8) | address[110]; 
+      q1 = data;
+      Serial.print("\t q1 = "); Serial.print(q1); Serial.println(" VAR");
+
+      //Reactive power phase L2
+      data = 0;
+      data = (data << 8) | address[111]; 
+      data = (data << 8) | address[112]; 
+      data = (data << 8) | address[113]; 
+      data = (data << 8) | address[114]; 
+      q2 = data;
+      Serial.print("\t q2 = "); Serial.print(q2); Serial.println(" VAR");
+
+      //Reactive power phase L3
+      data = 0;
+      data = (data << 8) | address[115]; 
+      data = (data << 8) | address[116]; 
+      data = (data << 8) | address[117]; 
+      data = (data << 8) | address[118]; 
+      q3 = data;
+      Serial.print("\t q3 = "); Serial.print(q3); Serial.println(" VAR");
 
       //THD current L1
       data = 0;
