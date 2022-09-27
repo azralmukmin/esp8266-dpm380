@@ -8,8 +8,8 @@ SoftwareSerial modbus;
 
 unsigned char address[200];
 int temp, time_modbus = 200;
-unsigned long int data, pkWh, kVAh, p1, p2, p3, s1, s2, s3;
-signed long int  q1, q2, q3, W, VA, VAR;
+unsigned long int data, pkWh, kVAh;
+signed long int p1, p2, p3, s1, s2, s3, q1, q2, q3, W, VA, VAR;
 float pf, Hz, I1, I2, I3, In, v12, v23, v31, v1, v2, v3;
 float thdI1, thdI2, thdI3, thdV1, thdV2, thdV3;
 
