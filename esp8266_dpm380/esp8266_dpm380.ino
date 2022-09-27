@@ -7,9 +7,9 @@
 SoftwareSerial modbus;
 
 unsigned char address[200];
-int temp;
-unsigned long int data, pkWh, kVAh, p1, p2, p3, s1, s2, s3, q1, q2, q3;
-signed long int W, VA, VAR;
+int temp, time_modbus = 200;
+unsigned long int data, pkWh, kVAh, p1, p2, p3, s1, s2, s3;
+signed long int  q1, q2, q3, W, VA, VAR;
 float pf, Hz, I1, I2, I3, In, v12, v23, v31, v1, v2, v3;
 float thdI1, thdI2, thdI3, thdV1, thdV2, thdV3;
 
@@ -24,7 +24,7 @@ void loop() {
   temp = 0;
 
   modbus_request(0x01, 0xA0, 0x58);  // Slave register, Start register, request register
-  delay(100);
+  delay(time_modbus);
   modbus_receive();
 
   if (temp == 1) Serial.println("\n----Receive Success----\n");
@@ -66,7 +66,7 @@ void modbus_receive() {
 
   if (modbus.available()) {
     
-    delay(100);
+    delay(time_modbus);
     int i = 0;
     while (modbus.available()) address[i++] = modbus.read();
 
